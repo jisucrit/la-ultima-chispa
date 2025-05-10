@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>LA ÚLTIMA CHISPA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Share Tech Mono', monospace;
+      background-color: black;
+      color: #e0e0e0;
+      overflow: hidden;
+      animation: fondoCaotico 6s infinite alternate;
+    }
+
+    @keyframes fondoCaotico {
+      0% { background-color: #000; }
+      50% { background-color: #111; }
+      100% { background-color: #000; }
+    }
+
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      color: #ffcc00;
+      text-align: center;
+      font-size: 52px;
+      text-shadow: 2px 2px 10px red;
+      animation: parpadeo 1.5s infinite alternate;
+      margin-top: 30px;
+    }
+
+    @keyframes parpadeo {
+      from { opacity: 1; transform: scale(1); }
+      to { opacity: 0.7; transform: scale(1.05); }
+    }
+
+    .intro, form {
+      max-width: 720px;
+      margin: 30px auto;
+      background-color: rgba(20, 0, 0, 0.85);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 30px rgba(255, 0, 0, 0.6), inset 0 0 15px rgba(255, 255, 255, 0.1);
+      animation: vibrar 1s infinite ease-in-out;
+    }
+
+    @keyframes vibrar {
+      0%, 100% { transform: translate(0, 0); }
+      25% { transform: translate(-2px, 2px); }
+      50% { transform: translate(2px, -2px); }
+      75% { transform: translate(-2px, -2px); }
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      background-color: #2b2b2b;
+      color: #ffffff;
+      border: 1px solid #999;
+      border-radius: 5px;
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    input[type="submit"] {
+      background-color: #ffcc00;
+      color: #000;
+      font-weight: bold;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+
+    .abandonar-btn {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      background-color: #990000;
+      color: #fff;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      z-index: 100;
+    }
+
+    #game-over, #victory {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 100vw;
+      background-color: black;
+      z-index: 9999;
+      text-align: center;
+      padding-top: 100px;
+      color: white;
+    }
+
+    #victory.revealed {
+      animation: flashScreen 1s ease-in-out 2;
+      background-color: #000000;
+    }
+
+    @keyframes flashScreen {
+      0%, 100% { background-color: black; }
+      50% { background-color: white; color: black; }
+    }
+
+    .return-btn {
+      margin-top: 40px;
+      padding: 12px 25px;
+      font-size: 18px;
+      background-color: #ff0000;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    #victory h2 {
+      font-size: 50px;
+      margin-bottom: 30px;
+      color: #00ffcc; /* ← COLOR ACTUALIZADO AQUÍ */
+    }
+  </style>
+</head>
+<body>
+
+  <h1>LA ÚLTIMA CHISPA</h1>
+
+  <div class="intro">
+    <p><strong>¡ALERTA!</strong> Hay una falla masiva en la red eléctrica nacional. Solo tienes 20 minutos.</p>
+  </div>
+
+  <form id="formulario">
+    <label>Código lógico (4 dígitos):</label>
+    <input type="text" id="codigo" maxlength="4" required>
+    <small>Pista: Suma más común al lanzar dos dados.</small>
+
+    <label>Palabra invisible que alimenta el fuego:</label>
+    <input type="text" id="oxigeno" required>
+
+    <label>Reordena las letras: ENERGAI</label>
+    <input type="text" id="desorden" required>
+
+    <label>¿Qué NO conduce electricidad?</label>
+    <select id="material">
+      <option value="">Selecciona</option>
+      <option>Oro</option>
+      <option>Agua</option>
+      <option>Vidrio</option>
+      <option>Cobre</option>
+    </select>
+
+    <input type="submit" value="Enviar Respuestas">
+  </form>
+
+  <button class="abandonar-btn" onclick="gameOver()">Abandonar</button>
+
+  <div id="game-over">
+    <h2>GAME OVER</h2>
+    <button class="return-btn" onclick="location.reload()">Return</button>
+  </div>
+
+  <div id="victory">
+    <h2>¡HAS RESTAURADO LA ENERGÍA!</h2>
+    <canvas id="confetti-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;"></canvas>
+    <button class="return-btn" onclick="location.reload()">Return</button>
+  </div>
+
+  <script>
+    function gameOver() {
+      document.getElementById("game-over").style.display = "block";
+      document.getElementById("formulario").style.display = "none";
+      document.querySelector(".intro").style.display = "none";
+    }
+
+    function lanzarConfeti() {
+      const duration = 4 * 1000;
+      const animationEnd = Date.now() + duration;
+      const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 1000 };
+
+      function frame() {
+        const timeLeft = animationEnd - Date.now();
+        if (timeLeft <= 0) return;
+        confetti(Object.assign({}, defaults, { particleCount: 50, origin: { x: Math.random(), y: Math.random() - 0.2 } }));
+        requestAnimationFrame(frame);
+      }
+
+      frame();
+    }
+
+    document.getElementById("formulario").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const codigo = document.getElementById("codigo").value.trim();
+      const oxigeno = document.getElementById("oxigeno").value.trim().toLowerCase();
+      const desorden = document.getElementById("desorden").value.trim().toLowerCase();
+      const material = document.getElementById("material").value.trim().toLowerCase();
+
+      if (
+        codigo === "7" || codigo === "07" || codigo === "007" || codigo === "0077" || codigo === "7777" || codigo === "11" ||
+        oxigeno === "oxígeno" || oxigeno === "oxigeno" &&
+        desorden === "energía" || desorden === "energia" &&
+        material === "vidrio"
+      ) {
+        document.getElementById("victory").style.display = "block";
+        document.getElementById("formulario").style.display = "none";
+        document.querySelector(".intro").style.display = "none";
+        document.getElementById("victory").classList.add("revealed");
+        setTimeout(lanzarConfeti, 1000);
+      } else {
+        alert("❌ Alguna respuesta es incorrecta. Intenta de nuevo.");
+      }
+    });
+  </script>
+</body>
+</html>
+
